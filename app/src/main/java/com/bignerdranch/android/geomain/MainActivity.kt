@@ -1,10 +1,14 @@
 package com.bignerdranch.android.geomain
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityOptions
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.annotation.RequiresApi
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -14,6 +18,7 @@ import android.widget.Toast
 private const val TAG = "MainActivity"
 private const val KEY_INDEX = "index"
 private const val REQUEST_CODE_CHEAT = 0
+private const val KEY_IS_CHEATING = "isCheating"
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var questionTextView: TextView
 
 
+    //@RequiresApi(Build.VERSION_CODES.M)
+    @SuppressLint("RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) called")
@@ -35,6 +42,9 @@ class MainActivity : AppCompatActivity() {
 
         val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
         quizViewModel.currentIndex = currentIndex
+
+        val isCheater = savedInstanceState?.getBoolean(KEY_IS_CHEATING, false) ?: false
+        quizViewModel.isCheater = isCheater
 
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
@@ -50,10 +60,16 @@ class MainActivity : AppCompatActivity() {
             checkAnswers(false)
         }
 
-        cheatButton.setOnClickListener {
+        cheatButton.setOnClickListener { view ->
             val answerIsTrue = quizViewModel.currentQuestionAnswer
             val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
-            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val options = ActivityOptions.makeClipRevealAnimation(view, 0, 0, view.width, view.height)
+                startActivityForResult(intent, REQUEST_CODE_CHEAT, options.toBundle())
+            } else {
+                startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            }
+
         }
 
         nextButton.setOnClickListener {
@@ -85,6 +101,7 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(savedInstanceState)
         Log.i(TAG, "onSavedInstanceState")
         savedInstanceState.putInt(KEY_INDEX, quizViewModel.currentIndex)
+        savedInstanceState.putBoolean(KEY_IS_CHEATING, quizViewModel.isCheater)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -97,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun cheak () {}
+
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "onStart called")

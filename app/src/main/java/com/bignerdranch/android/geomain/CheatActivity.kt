@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.arch.lifecycle.ViewModelProviders
 
 private const val EXTRA_ANSWER_IS_TRUE = "com.bignerdranch.android.geomain.answer_is_true"
 const val EXTRA_ANSWER_SHOWN = ".CheatActivity.answer_shown"
@@ -33,8 +34,6 @@ class CheatActivity : AppCompatActivity() {
             answerTextView.setText(answerText)
             setAnswerShownResult(true)
         }
-
-
     }
 
     private fun setAnswerShownResult(isAnswerShown: Boolean) {
