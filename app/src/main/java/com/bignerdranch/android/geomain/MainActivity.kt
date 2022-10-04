@@ -97,6 +97,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun cheak () {}
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "onStart called")
